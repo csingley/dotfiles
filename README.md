@@ -10,7 +10,7 @@ What only one machine needs (local PATH additions, aliases for local tools, key 
 that machine's config. Colors come from the machine's theme module (starship reads its palette).
 
 ```nix
-inputs.dotfiles.url = "git+ssh://git@github.com/csingley/dotfiles";
+inputs.dotfiles.url = "github:csingley/dotfiles";
 # home-manager modules:
 dotfiles.homeModules.zsh
 ```
