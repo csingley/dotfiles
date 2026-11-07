@@ -42,12 +42,13 @@ in
 
     shellAliases.ll = "ls -lah";
 
-    # zsh doesn't source the Nix profile itself; .zshenv covers every kind of shell. Order 900 so a
+    # zsh doesn't source the Nix profile itself; .zshenv covers every kind of shell. The script is
+    # where Nix's installer puts it, or where a distro's nix package does (Arch). Order 900 so a
     # machine's own PATH additions (at a later order) come after the de-duplication.
     envExtra = lib.mkOrder 900 ''
-      if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      fi
+      for f in /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh /etc/profile.d/nix-daemon.sh; do
+        if [ -e "$f" ]; then . "$f"; break; fi
+      done
       typeset -U path # PATH without duplicates; the first occurrence wins
     '';
 
