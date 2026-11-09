@@ -50,6 +50,7 @@
         inherit pkgs;
         modules = [
           ./zsh
+          self.homeModules.neovim
           {
             home = {
               username = "test";
@@ -63,6 +64,7 @@
     {
       homeModules = {
         zsh = ./zsh;
+        neovim = import ./nvim/home.nix nvim;
         default = ./zsh;
       };
 
@@ -84,6 +86,15 @@
           must 'HISTFILE="/home/test/.local/state/zsh/history"' .config/zsh/.zshrc
           must 'starship init zsh' .config/zsh/.zshrc
           must 'typeset -U path' .config/zsh/.zshenv
+          touch $out
+        '';
+        neovim-home = pkgs.runCommand "dotfiles-neovim-home-check" { } ''
+          cd ${hm.config.home.path}
+          must() { grep -q "$@" || { echo "missing: $*"; exit 1; }; }
+          test -x bin/nvim
+          must 'exec /nix/store/.*/bin/nvim' bin/vi
+          must 'exec /nix/store/.*/bin/nvim' bin/vim
+          must 'EDITOR="nvim"' etc/profile.d/hm-session-vars.sh
           touch $out
         '';
       };

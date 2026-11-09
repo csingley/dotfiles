@@ -17,7 +17,18 @@ inputs:
     default = config.nvim-lib.pluginsFromPrefix "plugins-" inputs;
   };
 
-  config.settings.config_directory = ./.;
+  # Only what nvim reads, so editing the Nix files here doesn't change the editor. A string, not
+  # the fileset's attrset: settings are serialized into Lua, and the attrset would drag the whole
+  # source directory along (its origSrc).
+  config.settings.config_directory = "${
+    lib.fileset.toSource {
+      root = ./.;
+      fileset = lib.fileset.unions [
+        ./init.lua
+        ./queries
+      ];
+    }
+  }";
 
   # nixd evaluates nixpkgs option/package completions against the same nixpkgs the editor was
   # built from, not whatever <nixpkgs> happens to be on NIX_PATH.

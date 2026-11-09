@@ -6,6 +6,7 @@ laptop.
 | Output | What |
 |---|---|
 | `homeModules.zsh` (also `default`) | zsh with vi keys, autosuggestions, history-substring search, syntax highlighting, fzf, direnv and the starship prompt |
+| `homeModules.neovim` | that editor in the user profile as nvim, vi and vim, and the default editor; options `dotfiles.neovim.colorscheme` and `.extraModules` |
 | `wrappers.neovim` | Neovim 0.12, built with [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules): `.wrap { pkgs; ... }` builds it with the caller's nixpkgs |
 | `packages.<system>.neovim` | the same, with this flake's nixpkgs and no colorscheme |
 
@@ -22,7 +23,16 @@ dotfiles.homeModules.zsh
 
 `nvim/module.nix` lists the plugins, tree-sitter grammars and tools; `nvim/init.lua` is the
 configuration (plugins load lazily through lze). The config is baked into the store and ignores
-`~/.config/nvim`. The caller passes what differs between machines:
+`~/.config/nvim`. A home-manager machine imports `homeModules.neovim` and sets what differs:
+
+```nix
+dotfiles.neovim = {
+  colorscheme = { name = "catppuccin-mocha"; site = pkgs.vimPlugins.catppuccin-nvim; };
+  extraModules = [ { specs.puppet = { data = null; runtimePkgs = [ puppet-languageserver ]; }; } ];
+};
+```
+
+Anything else builds the package directly, passing the same things:
 
 ```nix
 dotfiles.wrappers.neovim.wrap {
