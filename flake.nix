@@ -1,5 +1,5 @@
 {
-  description = "csingley's shell environment: zsh for home-manager, and Neovim";
+  description = "csingley's environment: zsh, tmux and Neovim for home-manager";
 
   inputs = {
     # Callers' own nixpkgs builds the editor (wrap { pkgs }); this one is for the
@@ -50,6 +50,7 @@
         inherit pkgs;
         modules = [
           ./zsh
+          ./tmux
           self.homeModules.neovim
           {
             home = {
@@ -64,6 +65,7 @@
     {
       homeModules = {
         zsh = ./zsh;
+        tmux = ./tmux;
         neovim = import ./nvim/home.nix nvim;
         default = ./zsh;
       };
@@ -87,6 +89,14 @@
           must 'starship init zsh' .config/zsh/.zshrc
           must 'typeset -U path' .config/zsh/.zshenv
           must 'SHELL:t} == zsh' .config/zsh/.zshenv
+          touch $out
+        '';
+        tmux = pkgs.runCommand "dotfiles-tmux-check" { } ''
+          cd ${hm.config.home-files}
+          must() { grep -q "$@" || { echo "missing: $*"; exit 1; }; }
+          must 'mode-keys  *vi' .config/tmux/tmux.conf
+          must 'monitor-bell on' .config/tmux/tmux.conf
+          must 'allow-passthrough on' .config/tmux/tmux.conf
           touch $out
         '';
         neovim-home = pkgs.runCommand "dotfiles-neovim-home-check" { } ''

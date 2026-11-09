@@ -1,11 +1,12 @@
 # dotfiles
 
-The shell environment and editor shared by every machine: the fleet, nous, macmini and the work
+The shell environment, multiplexer and editor shared by every machine: the fleet, nous, macmini and the work
 laptop.
 
 | Output | What |
 |---|---|
 | `homeModules.zsh` (also `default`) | zsh with vi keys, autosuggestions, history-substring search, syntax highlighting, fzf, direnv and the starship prompt |
+| `homeModules.tmux` | tmux with vi keys, mouse, long history, activity and bell marks on the window labels, and clipboard and passthrough for the terminal |
 | `homeModules.neovim` | that editor in the user profile as nvim, vi and vim, and the default editor; options `dotfiles.neovim.colorscheme` and `.extraModules` |
 | `wrappers.neovim` | Neovim 0.12, built with [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules): `.wrap { pkgs; ... }` builds it with the caller's nixpkgs |
 | `packages.<system>.neovim` | the same, with this flake's nixpkgs and no colorscheme |
@@ -17,6 +18,7 @@ that machine's config. Colors come from the machine's theme module (starship rea
 inputs.dotfiles.url = "github:csingley/dotfiles";
 # home-manager modules:
 dotfiles.homeModules.zsh
+dotfiles.homeModules.tmux
 ```
 
 ## Neovim
