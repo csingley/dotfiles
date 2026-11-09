@@ -86,6 +86,7 @@
           must 'HISTFILE="/home/test/.local/state/zsh/history"' .config/zsh/.zshrc
           must 'starship init zsh' .config/zsh/.zshrc
           must 'typeset -U path' .config/zsh/.zshenv
+          must 'SHELL:t} == zsh' .config/zsh/.zshenv
           touch $out
         '';
         neovim-home = pkgs.runCommand "dotfiles-neovim-home-check" { } ''

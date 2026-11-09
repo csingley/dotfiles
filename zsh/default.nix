@@ -50,6 +50,11 @@ in
         if [ -e "$f" ]; then . "$f"; break; fi
       done
       typeset -U path # PATH without duplicates; the first occurrence wins
+
+      # Tools read $SHELL. Where this zsh isn't the login shell (a work laptop's IT-owned bash),
+      # the session's value is the login shell's, and terminals don't override it for a Nix path
+      # that is not in /etc/shells. Where the login shell is already zsh, nothing changes.
+      [[ ''${SHELL:t} == zsh ]] || export SHELL=${config.programs.zsh.package}/bin/zsh
     '';
 
     initContent = ''
