@@ -34,7 +34,7 @@
         iftop
       ]
       # Linux interfaces: macOS has its own (dtruss, vm_stat, iostat, lsof -i).
-      ++ lib.optionals stdenv.isLinux [
+      ++ lib.optionals stdenv.hostPlatform.isLinux [
         strace
         sysstat # iostat, mpstat, sar
         # The maintained C rewrite of the Python iotop. Distros install it as `iotop` too
