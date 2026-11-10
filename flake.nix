@@ -62,6 +62,24 @@
           }
         ];
       };
+
+      # The same modules for macOS, to be evaluated (never built) by the darwin check below.
+      hmDarwin = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+        modules = [
+          ./zsh
+          ./tmux
+          ./tools
+          self.homeModules.neovim
+          {
+            home = {
+              username = "test";
+              homeDirectory = "/Users/test";
+              stateVersion = "26.05";
+            };
+          }
+        ];
+      };
     in
     {
       homeModules = {
@@ -122,6 +140,22 @@
           [ "$got" = "-u root iftop" ] || { echo "with options: $got"; exit 1; }
           touch $out
         '';
+        # The macOS profile must evaluate: a package missing there, or an unguarded Linux-only one,
+        # fails here instead of on a Mac. Nothing is built; the profile's derivation is only
+        # computed, and its context dropped so the Linux check does not depend on it.
+        darwin = pkgs.runCommand "dotfiles-darwin-eval-check"
+          {
+            profile = builtins.unsafeDiscardStringContext hmDarwin.config.home.path.drvPath;
+            tools = lib.concatMapStringsSep " " (p: p.pname or p.name) hmDarwin.config.dotfiles.tools.packages;
+          }
+          ''
+            echo "$profile"
+            case " $tools " in *" ripgrep "*) ;; *) echo "tools list lost ripgrep: $tools"; exit 1 ;; esac
+            for n in strace sysstat iotop-c powertop; do
+              case " $tools " in *" $n "*) echo "Linux-only on macOS: $n"; exit 1 ;; esac
+            done
+            touch $out
+          '';
         neovim-home = pkgs.runCommand "dotfiles-neovim-home-check" { } ''
           cd ${hm.config.home.path}
           must() { grep -q "$@" || { echo "missing: $*"; exit 1; }; }
