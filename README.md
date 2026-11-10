@@ -7,7 +7,7 @@ laptop.
 |---|---|
 | `homeModules.zsh` (also `default`) | zsh with vi keys, autosuggestions, history-substring search, syntax highlighting, fzf, direnv and the starship prompt |
 | `homeModules.tmux` | tmux with vi keys, mouse, long history, activity and bell marks on the window labels, and clipboard and passthrough for the terminal |
-| `homeModules.tools` | tools without a configuration of their own, as `dotfiles.tools.packages`: ripgrep, fd, fzf, direnv, jq, yq, curl, bat, btop, tree, lsof, dig, socat, iftop; on Linux also strace, sysstat, iotop-c, powertop. Not setuid: root-only ones (iftop, iotop-c, powertop) need `sudo` with the full path |
+| `homeModules.tools` | tools without a configuration of their own, as `dotfiles.tools.packages`: ripgrep, fd, fzf, direnv, jq, yq, curl, bat, btop, tree, lsof, dig, socat, iftop; on Linux also strace, sysstat, iotop-c, powertop. Not setuid: for the root-only ones (iftop, iotop-c, powertop) zsh's `sudo cmd` passes the command's full path, since sudo's `secure_path` omits the Nix profile |
 | `homeModules.neovim` | that editor in the user profile as nvim, vi and vim, and the default editor; options `dotfiles.neovim.colorscheme`, `.nerdFont` and `.extraModules` |
 | `wrappers.neovim` | Neovim 0.12, built with [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules): `.wrap { pkgs; ... }` builds it with the caller's nixpkgs |
 | `packages.<system>.neovim` | the same, with this flake's nixpkgs and no colorscheme |

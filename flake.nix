@@ -108,6 +108,20 @@
           done
           touch $out
         '';
+        # `sudo cmd` passes the command's full path (the Nix profile is not on sudo's secure_path);
+        # anything else goes through as typed.
+        zsh-sudo = pkgs.runCommand "dotfiles-zsh-sudo-check" { nativeBuildInputs = [ pkgs.zsh ]; } ''
+          mkdir fake nix
+          printf '#!/bin/sh\necho "$@"\n' > fake/sudo
+          printf '#!/bin/sh\n' > nix/iftop
+          chmod +x fake/sudo nix/iftop
+          export PATH=$PWD/nix:$PWD/fake:$PATH
+          got=$(zsh -fc 'source ${./zsh/funcs.sh}; sudo iftop -i eth0')
+          [ "$got" = "$PWD/nix/iftop -i eth0" ] || { echo "plain: $got"; exit 1; }
+          got=$(zsh -fc 'source ${./zsh/funcs.sh}; sudo -u root iftop')
+          [ "$got" = "-u root iftop" ] || { echo "with options: $got"; exit 1; }
+          touch $out
+        '';
         neovim-home = pkgs.runCommand "dotfiles-neovim-home-check" { } ''
           cd ${hm.config.home.path}
           must() { grep -q "$@" || { echo "missing: $*"; exit 1; }; }

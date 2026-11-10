@@ -3,8 +3,9 @@
 # (zsh's fzf, direnv and starship, Neovim, tmux) come with their own modules; fzf and direnv are
 # listed here too so they are on the PATH whichever modules a machine imports.
 #
-# These are not setuid and have no file capabilities. iftop, iotop and powertop need root, and
-# sudo's secure_path usually lacks the Nix profile, so `sudo iftop` needs the full path.
+# These are not setuid and have no file capabilities. iftop, iotop-c and powertop need root, and
+# sudo's secure_path usually lacks the Nix profile. The zsh module's `sudo` function passes the full
+# path for `sudo cmd`; other shells, and `sudo -u user cmd`, need `sudo $(which cmd)`.
 {
   config,
   lib,
