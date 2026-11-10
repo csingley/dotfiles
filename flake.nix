@@ -121,9 +121,10 @@
         '';
         tools = pkgs.runCommand "dotfiles-tools-check" { } ''
           cd ${hm.config.home.path}
-          for b in rg fd fzf direnv jq yq curl bat btop tree lsof dig socat iftop strace iostat iotop-c powertop; do
+          for b in rg fd fzf direnv jq yq curl bat btop tree lsof dig socat iftop strace iostat iotop iotop-c powertop; do
             test -x bin/$b || { echo "missing: $b"; exit 1; }
           done
+          test -e share/man/man8/iotop.8.gz
           touch $out
         '';
         # `sudo cmd` passes the command's full path (the Nix profile is not on sudo's secure_path);
