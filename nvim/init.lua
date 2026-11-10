@@ -160,8 +160,40 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menu,preview,noselect'
 vim.o.termguicolors = true
 
--- Yank and put use the system clipboard. Deferred: probing the clipboard provider is slow at
--- startup. x and c delete into the black-hole register so they don't clobber it; d still cuts.
+-- Nerd Font glyphs: the Nix setting, or NVIM_NERD_FONT=1 (or 0) set in a shell that knows better,
+-- as over ssh, where the terminal's font is not the server's to know.
+do
+  local env = vim.env.NVIM_NERD_FONT
+  if env ~= nil and env ~= '' then
+    vim.g.have_nerd_font = env ~= '0'
+  else
+    vim.g.have_nerd_font = nixInfo(false, 'settings', 'nerdFont') == true
+  end
+end
+
+-- Yank and put use the system clipboard. Without a clipboard tool (a headless server) copying goes
+-- through OSC 52 to the terminal you are sitting at, over ssh and tmux alike. OSC 52 only writes:
+-- paste is the terminal's own (Ctrl-Shift-V), and "+ reads back the last yank. The option is
+-- deferred: probing the clipboard provider is slow at startup. x and c delete into the black-hole
+-- register so they don't clobber it; d still cuts.
+do
+  local has_tool = vim.fn.has('mac') == 1
+    or vim.fn.has('wsl') == 1
+    or vim.fn.has('win32') == 1
+    or (vim.env.WAYLAND_DISPLAY and vim.fn.executable('wl-copy') == 1)
+    or (vim.env.DISPLAY and (vim.fn.executable('xclip') == 1 or vim.fn.executable('xsel') == 1))
+  if not has_tool then
+    local osc52 = require('vim.ui.clipboard.osc52')
+    local function paste()
+      return { vim.fn.split(vim.fn.getreg(''), '\n'), vim.fn.getregtype('') }
+    end
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = { ['+'] = osc52.copy('+'), ['*'] = osc52.copy('*') },
+      paste = { ['+'] = paste, ['*'] = paste },
+    }
+  end
+end
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
@@ -258,6 +290,7 @@ nixInfo.lze.load {
         -- oil takes over directory buffers instead (see the oil spec)
         explorer = { replace_netrw = false, },
         picker = {
+          icons = { files = { enabled = vim.g.have_nerd_font } },
           sources = {
             explorer = {
               auto_close = true,
@@ -372,6 +405,7 @@ nixInfo.lze.load {
         default_file_explorer = true,
         delete_to_trash = true,
         prompt_save_on_select_new_entry = true,
+        columns = vim.g.have_nerd_font and { 'icon' } or {},
         view_options = { show_hidden = false },
       })
       vim.keymap.set('n', '-', '<cmd>Oil<CR>', { desc = 'Open parent directory (oil)' })

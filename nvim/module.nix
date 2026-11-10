@@ -60,6 +60,15 @@ inputs:
     description = "The colorscheme: its name and the files that provide it.";
   };
 
+  # Whether the terminal's font has Nerd Font glyphs (init.lua: vim.g.have_nerd_font). Off, the file
+  # browser and pickers draw no icons. No way to detect it: the font is the terminal's, and over ssh
+  # that terminal is another machine's.
+  options.settings.nerdFont = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = "Draw Nerd Font icons.";
+  };
+
   # tinted-nvim is the plugin Malachite's colorscheme is built on.
   config.specs.colors = {
     data = [

@@ -7,7 +7,7 @@ laptop.
 |---|---|
 | `homeModules.zsh` (also `default`) | zsh with vi keys, autosuggestions, history-substring search, syntax highlighting, fzf, direnv and the starship prompt |
 | `homeModules.tmux` | tmux with vi keys, mouse, long history, activity and bell marks on the window labels, and clipboard and passthrough for the terminal |
-| `homeModules.neovim` | that editor in the user profile as nvim, vi and vim, and the default editor; options `dotfiles.neovim.colorscheme` and `.extraModules` |
+| `homeModules.neovim` | that editor in the user profile as nvim, vi and vim, and the default editor; options `dotfiles.neovim.colorscheme`, `.nerdFont` and `.extraModules` |
 | `wrappers.neovim` | Neovim 0.12, built with [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules): `.wrap { pkgs; ... }` builds it with the caller's nixpkgs |
 | `packages.<system>.neovim` | the same, with this flake's nixpkgs and no colorscheme |
 
@@ -46,6 +46,10 @@ dotfiles.wrappers.neovim.wrap {
   specs.go.enable = false;
 }
 ```
+
+Icons need a Nerd Font in the terminal, which no program can detect (over ssh it is another machine's). They are off unless `dotfiles.neovim.nerdFont = true`; `NVIM_NERD_FONT=1` (or `0`) in a shell overrides the setting.
+
+Yank and put use the system clipboard. Where no tool provides one (a headless server), yanks go through OSC 52 to the terminal you are sitting at, over ssh and tmux. OSC 52 only writes: paste with the terminal's own paste.
 
 Whatever the colorscheme, the terminal draws the background, so a translucent terminal shows
 through. `nvim/queries/` extends the bash and python highlights.

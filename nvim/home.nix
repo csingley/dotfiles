@@ -23,6 +23,11 @@ in
       example = lib.literalExpression ''{ name = "catppuccin-mocha"; site = pkgs.vimPlugins.catppuccin-nvim; }'';
       description = "settings.colorscheme of the editor (./module.nix); {} keeps Neovim's default.";
     };
+    nerdFont = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "The terminal's font has Nerd Font glyphs: icons in the file browser and pickers.";
+    };
     extraModules = lib.mkOption {
       type = lib.types.listOf lib.types.raw;
       default = [ ];
@@ -37,6 +42,7 @@ in
           {
             inherit pkgs;
             settings.colorscheme = cfg.colorscheme;
+            settings.nerdFont = cfg.nerdFont;
           }
         ]
         ++ cfg.extraModules
